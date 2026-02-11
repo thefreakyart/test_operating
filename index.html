@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Strona</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card: #111827;
+      --accent: #38bdf8;
+      --text: #e5e7eb;
+      --muted: #9ca3af;
+    }
+
+    * {
+      box-sizing: border-box;
+      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    body {
+      margin: 0;
+      background: linear-gradient(180deg, #020617, var(--bg));
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 3rem;
+      letter-spacing: 2px;
+      margin-bottom: 40px;
+    }
+
+    /* ===== STRONA STARTOWA ===== */
+
+    .home {
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+    }
+
+    .home-grid {
+      flex: 1;
+      width: 100%;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+    }
+
+    .home-tile {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.4rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.4s ease, box-shadow 0.4s ease;
+      overflow: hidden;
+      background-size: cover;
+      background-position: center;
+    }
+
+    .home-tile::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(56,189,248,0.25), rgba(139,92,246,0.25));
+      opacity: 0;
+      transition: opacity 0.4s ease;
+    }
+
+    .home-tile span {
+      position: relative;
+      z-index: 2;
+    }
+
+    .home-tile:hover {
+      transform: scale(1.03);
+      box-shadow: inset 0 0 120px rgba(56,189,248,0.25);
+    }
+
+    .home-tile:hover::before {
+      opacity: 1;
+    }
+
+    /* ===== FAQ ===== */
+
+    .faq-page {
+      display: none;
+      max-width: 1100px;
+      margin: auto;
+      padding: 40px 20px 80px;
+    }
+
+    .back-btn {
+      margin-bottom: 20px;
+      background: none;
+      border: 1px solid rgba(255,255,255,0.2);
+      color: var(--text);
+      padding: 8px 14px;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+
+    .search {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 40px;
+    }
+
+    .search input {
+      width: 100%;
+      max-width: 500px;
+      padding: 14px 18px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,0.1);
+      background: rgba(255,255,255,0.05);
+      color: var(--text);
+      font-size: 1rem;
+    }
+
+    .tiles {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 24px;
+      margin-bottom: 50px;
+    }
+
+    .tile {
+      background: radial-gradient(circle at top, #1f2933, var(--card));
+      border-radius: 20px;
+      padding: 30px;
+      text-align: center;
+      font-size: 1.4rem;
+      cursor: pointer;
+      transition: transform 0.25s ease, box-shadow 0.25s ease, border 0.25s ease;
+      border: 1px solid transparent;
+    }
+
+    .tile:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+      border-color: var(--accent);
+    }
+
+    .tile.active {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px var(--accent), 0 20px 40px rgba(0,0,0,0.5);
+    }
+
+    .content { display: none; }
+    .content.active { display: block; }
+
+    .faq-item {
+      background: rgba(255,255,255,0.03);
+      border-radius: 14px;
+      margin-bottom: 16px;
+      border: 1px solid rgba(255,255,255,0.05);
+      overflow: hidden;
+    }
+
+    .faq-question {
+      padding: 18px 20px;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .faq-answer {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.4s ease, padding 0.4s ease;
+      padding: 0 20px;
+    }
+
+    .faq-answer img {
+      max-width: 100%;
+      border-radius: 12px;
+      margin-top: 15px;
+    }
+
+    /* ===== PDF MODAL ===== */
+    .pdf-modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.75);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      backdrop-filter: blur(6px);
+    }
+
+    .pdf-modal.active {
+      display: flex;
+    }
+
+    .pdf-modal-content {
+      width: 90%;
+      height: 90%;
+      background: #0b1220;
+      border-radius: 16px;
+      position: relative;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+      overflow: hidden;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .pdf-modal iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+
+    .pdf-close {
+      position: absolute;
+      top: 15px;
+      right: 20px;
+      background: rgba(255,255,255,0.1);
+      border: none;
+      color: white;
+      font-size: 1.2rem;
+      padding: 6px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    .open-pdf-btn {
+      margin-top: 15px;
+      padding: 10px 16px;
+      background: var(--accent);
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.96); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    .faq-item.active .faq-answer {
+      max-height: 800px;
+      padding: 0 20px 20px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ===== HOME ===== -->
+  <section class="home" id="home">
+    <h1>cokolwiek</h1>
+
+    <div class="home-grid">
+      <div class="home-tile" id="goSystems" style="background-image: url('images/systemy.jpg')">
+        <span>Systemy</span>
+      </div>
+      <div class="home-tile" style="background-image: url('images/produkt.jpg')">
+        <span>Produkt</span>
+      </div>
+      <div class="home-tile" style="background-image: url('images/test.jpg')">
+        <span>Test 1</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== FAQ ===== -->
+  <section class="faq-page" id="faqPage">
+    <button class="back-btn" id="backHome">← Powrót</button>
+    <h1>FAQ</h1>
+
+    <div class="search">
+      <input type="text" id="searchInput" placeholder="Szukaj w FAQ..." />
+    </div>
+
+    <div class="tiles">
+      <div class="tile" data-target="crm">CRM</div>
+      <div class="tile" data-target="welyo">Welyo</div>
+      <div class="tile" data-target="jira">Jira</div>
+      <div class="tile" data-target="zimbra">Zimbra</div>
+    </div>
+
+    <div id="crm" class="content">
+      <div class="faq-item">
+        <div class="faq-question">Instalacja CRM</div>
+        <div class="faq-answer">
+          <p>Opis rozwiązania...</p>
+          
+          <!-- Przykładowe zdjęcie -->
+          <img src="images/przyklad.png" alt="Przykład rozwiązania" />
+
+          <!-- Przycisk otwierający PDF w modalu -->
+          <button class="open-pdf-btn" data-pdf="docs/prezentacja.pdf">Otwórz prezentację PDF</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="welyo" class="content"></div>
+    <div id="jira" class="content"></div>
+    <div id="zimbra" class="content"></div>
+
+  </section>
+
+  <!-- ===== PDF MODAL ===== -->
+  <div class="pdf-modal" id="pdfModal">
+    <div class="pdf-modal-content">
+      <button class="pdf-close" id="closePdf">✕</button>
+      <iframe id="pdfFrame"></iframe>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+
+      const home = document.getElementById('home');
+      const faqPage = document.getElementById('faqPage');
+      const goSystems = document.getElementById('goSystems');
+      const backHome = document.getElementById('backHome');
+      const tiles = document.querySelectorAll('.tile');
+      const contents = document.querySelectorAll('.content');
+      const searchInput = document.getElementById('searchInput');
+
+      if (goSystems && home && faqPage) {
+        goSystems.addEventListener('click', () => {
+          home.style.display = 'none';
+          faqPage.style.display = 'block';
+        });
+      }
+
+      if (backHome && home && faqPage) {
+        backHome.addEventListener('click', () => {
+          faqPage.style.display = 'none';
+          home.style.display = 'flex';
+        });
+      }
+
+      tiles.forEach(tile => {
+        tile.addEventListener('click', () => {
+          const target = tile.dataset.target;
+          const targetElement = document.getElementById(target);
+
+          tiles.forEach(t => t.classList.remove('active'));
+          contents.forEach(c => c.classList.remove('active'));
+
+          tile.classList.add('active');
+
+          if (targetElement) {
+            targetElement.classList.add('active');
+          }
+        });
+      });
+
+      document.addEventListener('click', e => {
+        if (e.target.classList.contains('faq-question')) {
+          const parent = e.target.parentElement;
+          if (parent) {
+            parent.classList.toggle('active');
+          }
+        }
+      });
+
+      if (searchInput) {
+        searchInput.addEventListener('input', () => {
+          const query = searchInput.value.toLowerCase();
+          document.querySelectorAll('.content.active .faq-item').forEach(item => {
+            const textMatch = item.innerText.toLowerCase().includes(query);
+            item.style.display = textMatch ? '' : 'none';
+          });
+        });
+      }
+
+    
+      /* ===== PDF MODAL LOGIC ===== */
+      const pdfModal = document.getElementById('pdfModal');
+      const pdfFrame = document.getElementById('pdfFrame');
+      const closePdf = document.getElementById('closePdf');
+
+      document.addEventListener('click', (e) => {
+        if (e.target.classList.contains('open-pdf-btn')) {
+          const pdfSrc = e.target.dataset.pdf;
+          if (pdfSrc && pdfModal && pdfFrame) {
+            pdfFrame.src = pdfSrc;
+            pdfModal.classList.add('active');
+          }
+        }
+      });
+
+      if (closePdf && pdfModal && pdfFrame) {
+        closePdf.addEventListener('click', () => {
+          pdfModal.classList.remove('active');
+          pdfFrame.src = '';
+        });
+      }
+
+      if (pdfModal) {
+        pdfModal.addEventListener('click', (e) => {
+          if (e.target === pdfModal) {
+            pdfModal.classList.remove('active');
+            pdfFrame.src = '';
+          }
+        });
+      }
+
+    });
+  </script>
+</body>
+</html>
