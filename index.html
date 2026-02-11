@@ -86,7 +86,7 @@
       opacity: 1;
     }
 
-    /* ===== FAQ ===== */
+    /* ===== FAQ / PRODUKT ===== */
 
     .faq-page {
       display: none;
@@ -176,6 +176,11 @@
       padding: 0 20px;
     }
 
+    .faq-item.active .faq-answer {
+      max-height: 800px;
+      padding: 0 20px 20px;
+    }
+
     .faq-answer img {
       max-width: 100%;
       border-radius: 12px;
@@ -183,6 +188,7 @@
     }
 
     /* ===== PDF MODAL ===== */
+
     .pdf-modal {
       position: fixed;
       inset: 0;
@@ -206,7 +212,6 @@
       position: relative;
       box-shadow: 0 20px 60px rgba(0,0,0,0.6);
       overflow: hidden;
-      animation: fadeIn 0.3s ease;
     }
 
     .pdf-modal iframe {
@@ -237,16 +242,6 @@
       cursor: pointer;
       font-weight: 600;
     }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: scale(0.96); }
-      to { opacity: 1; transform: scale(1); }
-    }
-
-    .faq-item.active .faq-answer {
-      max-height: 800px;
-      padding: 0 20px 20px;
-    }
   </style>
 </head>
 <body>
@@ -259,12 +254,25 @@
       <div class="home-tile" id="goSystems" style="background-image: url('images/systemy.jpg')">
         <span>Systemy</span>
       </div>
-      <div class="home-tile" style="background-image: url('images/produkt.jpg')">
+      <div class="home-tile" id="goProduct" style="background-image: url('images/produkt.jpg')">
         <span>Produkt</span>
       </div>
       <div class="home-tile" style="background-image: url('images/test.jpg')">
         <span>Test 1</span>
       </div>
+    </div>
+  </section>
+
+  <!-- ===== PRODUKT ===== -->
+  <section class="faq-page" id="productPage">
+    <button class="back-btn" id="backHomeFromProduct">← Powrót</button>
+    <h1>Produkty</h1>
+
+    <div class="tiles">
+      <div class="tile">Produkt A</div>
+      <div class="tile">Produkt B</div>
+      <div class="tile">Produkt C</div>
+      <div class="tile">Produkt D</div>
     </div>
   </section>
 
@@ -291,19 +299,12 @@
           <p>Opis rozwiązania...</p>
           <button class="open-pdf-btn" data-pdf="test_0.pdf">Otwórz prezentację PDF</button>
         </div>
-        
-      <div class="faq-item">
-        <div class="faq-question">inny problem</div>
-        <div class="faq-answer">
-          <p>Opis rozwiązania...</p>
-          <img src="images/przyklad.png" alt="Przykład rozwiązania" />
-        </div>
+      </div>
     </div>
 
     <div id="welyo" class="content"></div>
     <div id="jira" class="content"></div>
     <div id="zimbra" class="content"></div>
-
   </section>
 
   <!-- ===== PDF MODAL ===== -->
@@ -319,78 +320,101 @@
 
       const home = document.getElementById('home');
       const faqPage = document.getElementById('faqPage');
+      const productPage = document.getElementById('productPage');
+
       const goSystems = document.getElementById('goSystems');
+      const goProduct = document.getElementById('goProduct');
       const backHome = document.getElementById('backHome');
-      const tiles = document.querySelectorAll('.tile');
+      const backHomeFromProduct = document.getElementById('backHomeFromProduct');
+
+      const tiles = document.querySelectorAll('#faqPage .tile');
       const contents = document.querySelectorAll('.content');
       const searchInput = document.getElementById('searchInput');
 
-      if (goSystems && home && faqPage) {
+      const pdfModal = document.getElementById('pdfModal');
+      const pdfFrame = document.getElementById('pdfFrame');
+      const closePdf = document.getElementById('closePdf');
+
+      // ===== NAVIGATION =====
+
+      if (goSystems) {
         goSystems.addEventListener('click', () => {
           home.style.display = 'none';
           faqPage.style.display = 'block';
         });
       }
 
-      if (backHome && home && faqPage) {
+      if (goProduct) {
+        goProduct.addEventListener('click', () => {
+          home.style.display = 'none';
+          productPage.style.display = 'block';
+        });
+      }
+
+      if (backHome) {
         backHome.addEventListener('click', () => {
           faqPage.style.display = 'none';
           home.style.display = 'flex';
         });
       }
 
+      if (backHomeFromProduct) {
+        backHomeFromProduct.addEventListener('click', () => {
+          productPage.style.display = 'none';
+          home.style.display = 'flex';
+        });
+      }
+
+      // ===== FAQ SYSTEM SWITCH =====
+
       tiles.forEach(tile => {
         tile.addEventListener('click', () => {
-          const target = tile.dataset.target;
-          const targetElement = document.getElementById(target);
-
           tiles.forEach(t => t.classList.remove('active'));
           contents.forEach(c => c.classList.remove('active'));
 
           tile.classList.add('active');
-
-          if (targetElement) {
-            targetElement.classList.add('active');
+          const target = tile.dataset.target;
+          const targetContent = document.getElementById(target);
+          if (targetContent) {
+            targetContent.classList.add('active');
           }
         });
       });
 
+      // ===== ACCORDION =====
+
       document.addEventListener('click', e => {
         if (e.target.classList.contains('faq-question')) {
           const parent = e.target.parentElement;
-          if (parent) {
-            parent.classList.toggle('active');
-          }
+          if (parent) parent.classList.toggle('active');
         }
       });
+
+      // ===== SEARCH =====
 
       if (searchInput) {
         searchInput.addEventListener('input', () => {
           const query = searchInput.value.toLowerCase();
           document.querySelectorAll('.content.active .faq-item').forEach(item => {
-            const textMatch = item.innerText.toLowerCase().includes(query);
-            item.style.display = textMatch ? '' : 'none';
+            const match = item.innerText.toLowerCase().includes(query);
+            item.style.display = match ? '' : 'none';
           });
         });
       }
 
-    
-      /* ===== PDF MODAL LOGIC ===== */
-      const pdfModal = document.getElementById('pdfModal');
-      const pdfFrame = document.getElementById('pdfFrame');
-      const closePdf = document.getElementById('closePdf');
+      // ===== PDF MODAL =====
 
-      document.addEventListener('click', (e) => {
+      document.addEventListener('click', e => {
         if (e.target.classList.contains('open-pdf-btn')) {
           const pdfSrc = e.target.dataset.pdf;
-          if (pdfSrc && pdfModal && pdfFrame) {
+          if (pdfSrc) {
             pdfFrame.src = pdfSrc;
             pdfModal.classList.add('active');
           }
         }
       });
 
-      if (closePdf && pdfModal && pdfFrame) {
+      if (closePdf) {
         closePdf.addEventListener('click', () => {
           pdfModal.classList.remove('active');
           pdfFrame.src = '';
@@ -398,7 +422,7 @@
       }
 
       if (pdfModal) {
-        pdfModal.addEventListener('click', (e) => {
+        pdfModal.addEventListener('click', e => {
           if (e.target === pdfModal) {
             pdfModal.classList.remove('active');
             pdfFrame.src = '';
@@ -410,6 +434,3 @@
   </script>
 </body>
 </html>
-
-
-
